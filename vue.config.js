@@ -35,17 +35,18 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
-    }
+    },
     // 解决跨域问题
-    // proxy: {
-    //   [process.env.VUE_APP_BASE_API]: { // /dev-api
-    //     target: 'http://localhost:8001',
-    //     changeOrigin: true, // 开启代理服务器,
-    //     pathRewrite: {
-    //       ['^' + process.env.VUE_APP_BASE_API]: '' // /dev-api/test
-    //     }
-    //   }
-    // }
+    proxy: {
+      [process.env.VUE_APP_BASE_API]: { // /dev-api
+        target: 'https://api.jiajin.info',
+        secure: false,
+        changeOrigin: true, // 开启代理服务器,
+        pathRewrite: {
+          ['^' + process.env.VUE_APP_BASE_API]: '' // /dev-api/test
+        }
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

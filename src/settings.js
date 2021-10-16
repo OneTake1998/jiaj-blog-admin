@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '雎山月',
+  title: '快乐码男',
 
   /**
    * @type {boolean} true | false
