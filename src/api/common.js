@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 export default {
-  //上传图片
+  // 上传图片
   uploadImg(data) {
     return request({
       url: '/file/upload/image',
@@ -9,7 +9,7 @@ export default {
       data
     })
   },
-  //删除图片
+  // 删除图片
   deleteImg(fileUrl) {
     return request({
       url: '/file/delete',
@@ -19,14 +19,14 @@ export default {
       }
     })
   },
-  //获取音乐
+  // 获取音乐
   getMusicList() {
     return request({
       url: '/music',
-      method: 'get',
+      method: 'get'
     })
   },
-  //添加音乐记录
+  // 添加音乐记录
   addMusic(data) {
     return request({
       url: '/music',
@@ -34,7 +34,7 @@ export default {
       data
     })
   },
-  //修改音乐记录
+  // 修改音乐记录
   updateMusic(data) {
     return request({
       url: '/music',
@@ -42,7 +42,7 @@ export default {
       data
     })
   },
-  //删除音乐记录
+  // 删除音乐记录
   deleteMusic(id) {
     return request({
       url: '/music',
@@ -70,7 +70,7 @@ export default {
       }
     })
   },
-  //查询音乐
+  // 查询音乐
   queryMusic(id) {
     return request({
       url: '/music/query',
@@ -80,6 +80,5 @@ export default {
       }
     })
   }
-
 
 }

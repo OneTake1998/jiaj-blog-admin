@@ -1,14 +1,12 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
-import store from '@/store'
+import { Message } from 'element-ui'
 import { getToken, removeToken } from '@/utils/auth'
-import { PcCookie, Key } from '@/utils/cookie'
 
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 50000 // request timeout
 })
 
 service.interceptors.request.use(
@@ -52,7 +50,7 @@ service.interceptors.response.use(
     }
   },
   error => {
-    // console.log(error.response)
+    // console.log(error)
     // 非401状态码，则直接提示信息
     if (error.response && error.response.status !== 401) {
       Message({
@@ -61,7 +59,7 @@ service.interceptors.response.use(
         duration: 5 * 1000
       })
       return Promise.reject(error)
-    } else if (error.response.status == 401) {
+    } else if (error.response.status === 401) {
       window.location.href = `${process.env.VUE_APP_AUTH_CENTER_URL}?redirectURL=${window.location.href}`
     }
     return Promise.reject('令牌过期，重新认证')
