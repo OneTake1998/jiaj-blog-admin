@@ -1,11 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form
-      ref="formData"
-      :model="formData"
-      label-width="100px"
-      label-position="right"
-    >
+    <el-form ref="formData" :model="formData" label-width="100px" label-position="right">
       <el-form-item label="新浪：" prop="sinaUrl">
         <el-input v-model="formData.sinaUrl" maxlength="50" show-word-limit />
       </el-form-item>
@@ -22,24 +17,14 @@
         <el-input v-model="formData.csdnUrl" maxlength="50" show-word-limit />
       </el-form-item>
       <el-form-item label="bilibili：" prop="bilibiliUrl">
-        <el-input
-          v-model="formData.bilibiliUrl"
-          maxlength="50"
-          show-word-limit
-        />
+        <el-input v-model="formData.bilibiliUrl" maxlength="50" show-word-limit />
       </el-form-item>
       <el-form-item label="简介：" prop="intro">
         <el-input v-model="formData.intro" type="textarea" />
       </el-form-item>
       <el-form-item label="简历：" prop="resume">
-        <mavonEditor
-          ref="md"
-          v-model="formData.mdResume"
-          :autofocus="false"
-          @change="getMdHtml"
-          @imgAdd="uploadContentImg"
-          @imgDel="delConentImg"
-        />
+        <mavonEditor ref="md" v-model="formData.mdResume" :autofocus="false" @change="getMdHtml"
+          @imgAdd="uploadContentImg" @imgDel="delConentImg" />
       </el-form-item>
       <el-form-item align="center">
         <el-button type="primary" @click="handleSave()">保存</el-button>
@@ -53,6 +38,7 @@ import { mavonEditor } from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import aboutApi from '@/api/about'
 import commonApi from '@/api/common'
+import { getUserInfo } from '@/utils/user'
 export default {
   name: 'About',
   components: {
@@ -60,12 +46,17 @@ export default {
   },
   data() {
     return {
-      formData: {}
+      formData: {
+      }
     }
   },
   created() {
-    aboutApi.getAbout('1').then((response) => {
-      this.formData = response.data
+    //获取当前用户ID
+    this.formData.uid = JSON.parse(getUserInfo()).id;
+    aboutApi.getAbout(this.formData.uid).then((response) => {
+      if (response.data != null) {
+        this.formData = response.data
+      }
     })
   },
   methods: {
@@ -109,5 +100,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

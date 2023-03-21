@@ -139,7 +139,7 @@ export default {
         ispublic: [
           { required: true, message: '请选择是否公开', trigger: 'change' }
         ],
-        summary: [{ required: true, message: '请输入简介', trigger: 'blur' }],
+        // summary: [{ required: true, message: '请输入简介', trigger: 'blur' }],
         content: [
           { required: true, validator: validateContent, trigger: 'change' }
         ]
