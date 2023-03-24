@@ -1,13 +1,7 @@
 <template>
   <div class="login-container">
-    <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
-      auto-complete="on"
-      label-position="left"
-    >
+    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on"
+      label-position="left">
       <div class="title-container">
         <h3 class="title">快乐码男</h3>
       </div>
@@ -16,45 +10,23 @@
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
+        <el-input ref="username" v-model="loginForm.username" placeholder="Username" name="username" type="text"
+          tabindex="1" auto-complete="on" />
       </el-form-item>
 
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
+        <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
+          placeholder="Password" name="password" tabindex="2" auto-complete="on" @keyup.enter.native="handleLogin" />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon
-            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-          />
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
 
-      <el-button
-        type="primary"
-        :loading="loading"
-        style="width: 100%; margin-bottom: 30px"
-        @click.native.prevent="handleLogin"
-      >Login</el-button>
+      <el-button type="primary" :loading="loading" style="width: 100%; margin-bottom: 30px"
+        @click.native.prevent="handleLogin">Login</el-button>
     </el-form>
   </div>
 </template>
@@ -99,7 +71,7 @@ export default {
   },
   watch: {
     $route: {
-      handler: function(route) {
+      handler: function (route) {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
@@ -123,8 +95,9 @@ export default {
           this.$store
             .dispatch('user/login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || '/' })
-              this.loading = false
+                this.$router.push({ path: this.redirect || '/' })
+                this.loading = false
+           
             })
             .catch(() => {
               this.loading = false
@@ -146,12 +119,11 @@ export default {
 $bg: #283443;
 $light_gray: #fff;
 $cursor: #fff;
-$main-gradient: linear-gradient(
-  130deg,
-  rgb(36, 198, 220),
-  rgb(84, 51, 255) 41.07%,
-  rgb(255, 0, 153) 76.05%
-);
+$main-gradient: linear-gradient(130deg,
+    rgb(36, 198, 220),
+    rgb(84, 51, 255) 41.07%,
+    rgb(255, 0, 153) 76.05%);
+
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
   .login-container .el-input input {
     color: $cursor;
@@ -161,6 +133,7 @@ $main-gradient: linear-gradient(
 /* reset element-ui css */
 .login-container {
   background: #212121;
+
   .login-btn {
     width: 100%;
     margin-bottom: 30px;
@@ -168,6 +141,7 @@ $main-gradient: linear-gradient(
     color: white;
     border: 0 !important;
   }
+
   .el-input {
     display: inline-block;
     height: 47px;

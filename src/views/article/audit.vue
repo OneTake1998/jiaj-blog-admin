@@ -1,52 +1,22 @@
 <template>
-  <el-dialog
-    :title="title"
-    :visible.sync="visible"
-    width="70%"
-    :before-close="handleClose"
-  >
-    <el-form
-      ref="formData"
-      :model="formData"
-      :rules="rules"
-      label-width="100px"
-      label-position="right"
-    >
+  <el-dialog :title="title" :visible.sync="visible" width="100%" :before-close="handleClose" top="0">
+    <el-form ref="formData" :model="formData" :rules="rules" label-width="100px" label-position="right">
       <el-form-item label="标题：" prop="title">
-        <el-input
-          v-model="formData.title"
-          maxlength="50"
-          show-word-limit
-        />
+        <el-input v-model="formData.title" maxlength="50" show-word-limit />
       </el-form-item>
       <el-form-item label="标签：" prop="labelIds">
-        <el-cascader
-          v-model="formData.labelIds"
-          :options="labelOptions"
-          style="display: block"
-          :props="{
-            multiple: true,
-            emitPath: false,
-            children: 'labelList',
-            value: 'id',
-            label: 'name',
-          }"
-          clearable
-        />
+        <el-cascader v-model="formData.labelIds" :options="labelOptions" style="display: block" :props="{
+          multiple: true,
+          emitPath: false,
+          children: 'labelList',
+          value: 'id',
+          label: 'name',
+        }" clearable />
       </el-form-item>
       <el-form-item label="主图：" prop="imageUrl">
-        <el-upload
-          class="avatar-uploader"
-          action=""
-          accept="image/*"
-          :show-file-list="false"
-          :http-request="uploadMainImg"
-        >
-          <img
-            v-if="formData.imageUrl"
-            :src="formData.imageUrl"
-            class="avatar"
-          >
+        <el-upload class="avatar-uploader" action="" accept="image/*" :show-file-list="false"
+          :http-request="uploadMainImg">
+          <img v-if="formData.imageUrl" :src="formData.imageUrl" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon" />
         </el-upload>
       </el-form-item>
@@ -56,18 +26,12 @@
           <el-radio :label="0">不公开</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="简介：" prop="summary">
+      <!-- <el-form-item label="简介：" prop="summary">
         <el-input v-model="formData.summary" type="textarea" />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="内容：" prop="content">
-        <mavonEditor
-          ref="md"
-          v-model="formData.mdContent"
-          :autofocus="false"
-          @change="getMdHtml"
-          @imgAdd="uploadContentImg"
-          @imgDel="delConentImg"
-        />
+        <mavonEditor ref="md" v-model="formData.mdContent" :autofocus="false" @change="getMdHtml"
+          @imgAdd="uploadContentImg" @imgDel="delConentImg" />
       </el-form-item>
       <el-form-item v-if="isEdit" align="center">
         <el-button type="warning" @click="handleSave()">保存</el-button>
@@ -83,10 +47,12 @@ import categoryApi from '@/api/category'
 import commonApi from '@/api/common'
 // 引入 user cookie
 import { getUserInfo } from '@/utils/user'
+import { mount } from '@vue/test-utils'
+import { create } from 'istanbul-reports'
 // 引入 mavonEditor 组件和样式, 一定不要少了大括号
 import { mavonEditor } from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
-
+import { debounce } from "@/utils/common"
 export default {
   // 注册为子组件
   components: { mavonEditor },
@@ -144,8 +110,9 @@ export default {
           { required: true, validator: validateContent, trigger: 'change' }
         ]
       },
-      formData: {}, // 查询到的文章详情
-      labelOptions: [] // 渲染分类标签级联下拉框
+      formData: {
+      }, // 查询到的文章详情
+      labelOptions: [],// 渲染分类标签级联下拉框
     }
   },
 
@@ -182,11 +149,9 @@ export default {
               // 处理响应结果提示
               this.$message({
                 type: response.code === 20000 ? 'success' : 'error',
-                message: response.message
+                message: status === 1 ? "保存时间：" + new Date().toLocaleString() : response.message
               })
 
-              // 关闭弹窗
-              this.handleClose()
             })
           } else {
             // 新增
@@ -202,8 +167,7 @@ export default {
                 message: response.message
               })
 
-              // 关闭弹窗
-              this.handleClose()
+
             })
           }
         } else {
@@ -214,10 +178,14 @@ export default {
     // 发布文章
     handleRelease() {
       this._editOrRelease(2)
+      // 关闭弹窗
+      this.handleClose()
     },
     // 保存文章
     handleSave() {
       this._editOrRelease(1)
+      // 关闭弹窗
+      this.handleClose()
     },
 
     // 查询文章详情
@@ -260,13 +228,6 @@ export default {
         commonApi.deleteImg(this.formData.imageUrl)
       }
     },
-    // mdContent md内容，htmlContent 转成html的内容
-    getMdHtml(mdContent, htmlContent) {
-      // console.log('mdContent', mdContent)
-      // console.log('htmlContent', htmlContent)
-      this.formData.mdContent = mdContent
-      this.formData.htmlContent = htmlContent
-    },
     // 上传内容图片（图片位置编号，File对象）
     uploadContentImg(pos, file) {
       // console.log('上传内容图片：', file)
@@ -288,8 +249,17 @@ export default {
       // console.log('删除内容图片', fileUrl, file)
       // 删除内容图片
       commonApi.deleteImg(fileUrl)
-    }
-  }
+    },
+    // mdContent md内容，htmlContent 转成html的内容
+    getMdHtml: debounce(function (mdContent, htmlContent) {
+      // console.log('mdContent', mdContent)
+      // console.log('htmlContent', htmlContent)
+      this.formData.mdContent = mdContent
+      this.formData.htmlContent = htmlContent
+      //保存内容
+      this._editOrRelease(1)
+    }, 10000, false)
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -300,9 +270,11 @@ export default {
   position: relative;
   overflow: hidden;
 }
+
 .avatar-uploader .el-upload:hover {
   border-color: #409eff;
 }
+
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
@@ -311,6 +283,7 @@ export default {
   line-height: 178px;
   text-align: center;
 }
+
 .avatar {
   width: 178px;
   height: 178px;
