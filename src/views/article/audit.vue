@@ -1,42 +1,55 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="100%" :before-close="handleClose" top="0">
-    <el-form ref="formData" :model="formData" :rules="rules" label-width="100px" label-position="right">
-      <el-form-item label="标题：" prop="title">
-        <el-input v-model="formData.title" maxlength="50" show-word-limit />
-      </el-form-item>
-      <el-form-item label="标签：" prop="labelIds">
-        <el-cascader v-model="formData.labelIds" :options="labelOptions" style="display: block" :props="{
-          multiple: true,
-          emitPath: false,
-          children: 'labelList',
-          value: 'id',
-          label: 'name',
-        }" clearable />
-      </el-form-item>
-      <el-form-item label="主图：" prop="imageUrl">
-        <el-upload class="avatar-uploader" action="" accept="image/*" :show-file-list="false"
-          :http-request="uploadMainImg">
-          <img v-if="formData.imageUrl" :src="formData.imageUrl" class="avatar">
-          <i v-else class="el-icon-plus avatar-uploader-icon" />
-        </el-upload>
-      </el-form-item>
-      <el-form-item label="是否公开：" prop="ispublic">
-        <el-radio-group v-model="formData.ispublic">
-          <el-radio :label="1">公开</el-radio>
-          <el-radio :label="0">不公开</el-radio>
-        </el-radio-group>
-      </el-form-item>
+  <el-dialog :visible.sync="visible" width="100%"  :before-close="handleClose" top="0" >
+    <el-form ref="formData" :model="formData" :rules="rules" label-width="100px" label-position="top" >
+      <el-row :gutter="20" style="margin-top: -40px;margin-right: 20px;">
+        <el-col :span="8" :xs="{span: 24}">
+          <el-form-item prop="title">
+            <el-input v-model="formData.title" maxlength="50" show-word-limit placeholder="请输入标题"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="5" :xs="{span: 16}">
+          <el-form-item prop="labelIds">
+            <el-cascader v-model="formData.labelIds" :options="labelOptions" style="display: block" :props="{
+              multiple: true,
+              emitPath: false,
+              children: 'labelList',
+              value: 'id',
+              label: 'name',
+            }" clearable />
+          </el-form-item>
+        </el-col>
+        <el-col :span="4" :xs="{span: 8}">
+          <el-form-item prop="ispublic">
+            <el-radio-group v-model="formData.ispublic">
+              <el-radio :label="1">公开</el-radio>
+              <el-radio :label="0">不公开</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="2" :xs="{span: 11}">
+          <el-form-item prop="imageUrl">
+            <el-upload class="avatar-uploader" action="" accept="image/*" :show-file-list="false"
+              :http-request="uploadMainImg">
+              <img v-if="formData.imageUrl" :src="formData.imageUrl" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon" />
+            </el-upload>
+          </el-form-item>
+        </el-col>
+        <el-col :span="5" :xs="{span: 13}">
+          <el-form-item v-if="isEdit" align="right">
+            <el-button type="warning" @click="handleSave()">保存</el-button>
+            <el-button type="success" @click="handleRelease()">发布</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
       <!-- <el-form-item label="简介：" prop="summary">
         <el-input v-model="formData.summary" type="textarea" />
       </el-form-item> -->
-      <el-form-item label="内容：" prop="content">
+      <el-form-item prop="content">
         <mavonEditor ref="md" v-model="formData.mdContent" :autofocus="false" @change="getMdHtml"
-          @imgAdd="uploadContentImg" @imgDel="delConentImg" />
+          @imgAdd="uploadContentImg" @imgDel="delConentImg" style="height: calc(100vh - 140px);"/>
       </el-form-item>
-      <el-form-item v-if="isEdit" align="center">
-        <el-button type="warning" @click="handleSave()">保存</el-button>
-        <el-button type="success" @click="handleRelease()">发布</el-button>
-      </el-form-item>
+
     </el-form>
   </el-dialog>
 </template>
@@ -278,15 +291,15 @@ export default {
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
+  width: 41px;
+  height: 41px;
+  line-height: 41px;
   text-align: center;
 }
 
 .avatar {
-  width: 178px;
-  height: 178px;
+  width: 41px;
+  height: 41px;
   display: block;
 }
 </style>

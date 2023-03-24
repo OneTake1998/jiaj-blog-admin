@@ -39,7 +39,7 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       })
-      if (res.code === 401) {
+      if (res.code === 401 && res.message!="用户名或密码错误") {
         removeToken()
         window.location.href = `${process.env.VUE_APP_AUTH_CENTER_URL}/login?redirectURL=${window.location.href}`
         return Promise.reject('令牌过期，重新认证')
