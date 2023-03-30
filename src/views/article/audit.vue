@@ -179,8 +179,7 @@ export default {
                 type: response.code === 20000 ? 'success' : 'error',
                 message: response.message
               })
-
-
+              this.formData.id = response.data
             })
           }
         } else {
@@ -271,7 +270,7 @@ export default {
       this.formData.htmlContent = htmlContent
       //保存内容
       this._editOrRelease(1)
-    }, 10000, false)
+    }, 300000, true)
   },
 }
 </script>
