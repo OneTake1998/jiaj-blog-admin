@@ -1,13 +1,13 @@
 <template>
-  <el-dialog :visible.sync="visible" width="100%"  :before-close="handleClose" top="0" >
-    <el-form ref="formData" :model="formData" :rules="rules" label-width="100px" label-position="top" >
+  <el-dialog :visible.sync="visible" width="100%" :before-close="handleClose" top="0">
+    <el-form ref="formData" :model="formData" :rules="rules" label-width="100px" label-position="top">
       <el-row :gutter="20" style="margin-top: -40px;margin-right: 20px;">
-        <el-col :span="8" :xs="{span: 24}">
+        <el-col :span="8" :xs="{ span: 24 }">
           <el-form-item prop="title">
-            <el-input v-model="formData.title" maxlength="50" show-word-limit placeholder="请输入标题"/>
+            <el-input v-model="formData.title" maxlength="50" show-word-limit placeholder="请输入标题" />
           </el-form-item>
         </el-col>
-        <el-col :span="5" :xs="{span: 16}">
+        <el-col :span="5" :xs="{ span: 16 }">
           <el-form-item prop="labelIds">
             <el-cascader v-model="formData.labelIds" :options="labelOptions" style="display: block" :props="{
               multiple: true,
@@ -18,7 +18,7 @@
             }" clearable />
           </el-form-item>
         </el-col>
-        <el-col :span="4" :xs="{span: 8}">
+        <el-col :span="4" :xs="{ span: 8 }">
           <el-form-item prop="ispublic">
             <el-radio-group v-model="formData.ispublic">
               <el-radio :label="1">公开</el-radio>
@@ -26,7 +26,7 @@
             </el-radio-group>
           </el-form-item>
         </el-col>
-        <el-col :span="2" :xs="{span: 11}">
+        <el-col :span="2" :xs="{ span: 11 }">
           <el-form-item prop="imageUrl">
             <el-upload class="avatar-uploader" action="" accept="image/*" :show-file-list="false"
               :http-request="uploadMainImg">
@@ -35,7 +35,7 @@
             </el-upload>
           </el-form-item>
         </el-col>
-        <el-col :span="5" :xs="{span: 13}">
+        <el-col :span="5" :xs="{ span: 13 }">
           <el-form-item v-if="isEdit" align="right">
             <el-button type="warning" @click="handleSave()">保存</el-button>
             <el-button type="success" @click="handleRelease()">发布</el-button>
@@ -47,7 +47,7 @@
       </el-form-item> -->
       <el-form-item prop="content">
         <mavonEditor ref="md" v-model="formData.mdContent" :autofocus="false" @change="getMdHtml"
-          @imgAdd="uploadContentImg" @imgDel="delConentImg" style="height: calc(100vh - 140px);"/>
+          @imgAdd="uploadContentImg" @imgDel="delConentImg" style="height: calc(100vh - 140px);" />
       </el-form-item>
 
     </el-form>
@@ -128,7 +128,12 @@ export default {
       labelOptions: [],// 渲染分类标签级联下拉框
     }
   },
-
+  computed: {
+    //表单富文本内容
+    mdContent() {
+      return this.formData.mdContent;
+    }
+  },
   watch: {
     // 监听
     visible(val) {
@@ -138,10 +143,17 @@ export default {
         // val 为true，且有文章ID，则打开窗口，打开之后查询文章详情
         if (this.id != null) this.getArticleById()
       }
+    },
+    mdContent(val) {
+      this.timerSave();
     }
   },
 
   methods: {
+    //定时保存
+    timerSave:debounce(function(){
+      this._editOrRelease(1);
+    },18000,false),
     // 关闭窗口
     handleClose() {
       // 触发父组件关闭窗口
@@ -263,14 +275,14 @@ export default {
       commonApi.deleteImg(fileUrl)
     },
     // mdContent md内容，htmlContent 转成html的内容
-    getMdHtml: debounce(function (mdContent, htmlContent) {
-      // console.log('mdContent', mdContent)
-      // console.log('htmlContent', htmlContent)
+    getMdHtml(mdContent, htmlContent) {
+      // console.log('mdContent:', mdContent)
+      // console.log('htmlContent:', htmlContent)
       this.formData.mdContent = mdContent
       this.formData.htmlContent = htmlContent
-      //保存内容
-      this._editOrRelease(1)
-    }, 300000, true)
+      // //保存内容
+      // this._editOrRelease(1)
+    }
   },
 }
 </script>

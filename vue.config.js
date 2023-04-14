@@ -39,7 +39,7 @@ module.exports = {
     // 解决跨域问题
     proxy: {
       [process.env.VUE_APP_BASE_API]: { // /dev-api
-        target: 'https://api.jiajin.info',
+        target: 'https://api.jiajin.xyz',
         secure: false,
         changeOrigin: true, // 开启代理服务器,
         pathRewrite: {
@@ -97,7 +97,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()
