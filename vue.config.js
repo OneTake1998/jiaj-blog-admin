@@ -39,7 +39,7 @@ module.exports = {
     // 解决跨域问题
     proxy: {
       [process.env.VUE_APP_BASE_API]: { // /dev-api
-        target: 'https://api.jiajin.xyz',
+        target: '//api.jiajin.xyz',
         secure: false,
         changeOrigin: true, // 开启代理服务器,
         pathRewrite: {

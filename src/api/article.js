@@ -59,4 +59,18 @@ export default {
             data
         })
     },
+    //置顶
+    addTopping(id) {
+        return request({
+            url: `/article/add/topping/${id}`,
+            method: 'post'
+        })
+    },
+    //取消置顶
+    removeTopping(id) {
+        return request({
+            url: `/article/remove/topping/${id}`,
+            method: 'post'
+        })
+    },
 }

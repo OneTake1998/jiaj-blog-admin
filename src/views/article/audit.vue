@@ -2,7 +2,7 @@
   <el-dialog :visible.sync="visible" width="100%" :before-close="handleClose" top="0">
     <el-form ref="formData" :model="formData" :rules="rules" label-width="100px" label-position="top">
       <el-row :gutter="20" style="margin-top: -40px;margin-right: 20px;">
-        <el-col :span="8" :xs="{ span: 24 }">
+        <el-col :span="9" :xs="{ span: 24 }">
           <el-form-item prop="title">
             <el-input v-model="formData.title" maxlength="50" show-word-limit placeholder="请输入标题" />
           </el-form-item>
@@ -18,6 +18,11 @@
             }" clearable />
           </el-form-item>
         </el-col>
+        <!-- <el-col :span="2" :xs="{ span: 4 }">
+          <el-form-item prop="sort">
+            <el-input v-model="formData.sort" maxlength="50" type="number" show-word-limit placeholder="排序" />
+          </el-form-item>
+        </el-col> -->
         <el-col :span="4" :xs="{ span: 8 }">
           <el-form-item prop="ispublic">
             <el-radio-group v-model="formData.ispublic">
@@ -26,7 +31,7 @@
             </el-radio-group>
           </el-form-item>
         </el-col>
-        <el-col :span="2" :xs="{ span: 11 }">
+        <el-col :span="2" :xs="{ span: 10 }">
           <el-form-item prop="imageUrl">
             <el-upload class="avatar-uploader" action="" accept="image/*" :show-file-list="false"
               :http-request="uploadMainImg">
@@ -35,7 +40,7 @@
             </el-upload>
           </el-form-item>
         </el-col>
-        <el-col :span="5" :xs="{ span: 13 }">
+        <el-col :span="4" :xs="{ span: 10 }">
           <el-form-item v-if="isEdit" align="right">
             <el-button type="warning" @click="handleSave()">保存</el-button>
             <el-button type="success" @click="handleRelease()">发布</el-button>
@@ -62,7 +67,6 @@ import commonApi from '@/api/common'
 import { getUserInfo } from '@/utils/user'
 import { mount } from '@vue/test-utils'
 import { create } from 'istanbul-reports'
-// 引入 mavonEditor 组件和样式, 一定不要少了大括号
 import { mavonEditor } from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import { debounce } from "@/utils/common"
@@ -115,6 +119,9 @@ export default {
           { required: true, message: '请选择标签', trigger: 'blur' },
           { validator: validateLable, trigger: 'change' }
         ],
+        // sort: [
+        //   { required: true, message: '请输入排序', trigger: 'change' }
+        // ],
         ispublic: [
           { required: true, message: '请选择是否公开', trigger: 'change' }
         ],
@@ -124,7 +131,10 @@ export default {
         ]
       },
       formData: {
-      }, // 查询到的文章详情
+        type: Object,
+        default: null
+      }
+      , // 查询到的文章详情
       labelOptions: [],// 渲染分类标签级联下拉框
     }
   },
@@ -144,16 +154,19 @@ export default {
         if (this.id != null) this.getArticleById()
       }
     },
-    mdContent(val) {
-      this.timerSave();
+    formData: {
+      handler(val, oldVal) {
+        this.timerSave();
+      },
+      deep: true //true 深度监听
     }
   },
 
   methods: {
     //定时保存
-    timerSave:debounce(function(){
+    timerSave: debounce(function () {
       this._editOrRelease(1);
-    },18000,false),
+    }, 60000 * 6, false),
     // 关闭窗口
     handleClose() {
       // 触发父组件关闭窗口
@@ -162,7 +175,7 @@ export default {
       this.formData = {}
     },
     // 保存到草稿箱 status:1 草稿 status:2 发布
-    _editOrRelease(status) {
+    _editOrRelease(status, callback) {
       // 验证数据
       this.$refs.formData.validate((valid) => {
         if (valid) {
@@ -176,7 +189,7 @@ export default {
                 type: response.code === 20000 ? 'success' : 'error',
                 message: status === 1 ? "保存时间：" + new Date().toLocaleString() : response.message
               })
-
+              callback(true)
             })
           } else {
             // 新增
@@ -184,7 +197,6 @@ export default {
             this.formData.userId = userInfo.id
             this.formData.userImage = userInfo.imageUrl
             this.formData.nickName = userInfo.nickName
-            console.log(this.formData)
             api.addArticle(this.formData).then((response) => {
               // 处理响应结果提示
               this.$message({
@@ -192,24 +204,33 @@ export default {
                 message: response.message
               })
               this.formData.id = response.data
+              callback(true)
             })
           }
         } else {
-          return false
+          callback(false)
         }
       })
+
     },
     // 发布文章
     handleRelease() {
-      this._editOrRelease(2)
-      // 关闭弹窗
-      this.handleClose()
+      //操作失败
+      this._editOrRelease(2, b => {
+        if (b) {
+          // 关闭弹窗
+          this.handleClose()
+        }
+      });
     },
     // 保存文章
     handleSave() {
-      this._editOrRelease(1)
-      // 关闭弹窗
-      this.handleClose()
+      this._editOrRelease(1, b => {
+        if (b) {
+          // 关闭弹窗
+          this.handleClose()
+        }
+      });
     },
 
     // 查询文章详情

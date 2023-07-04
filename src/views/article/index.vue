@@ -6,61 +6,36 @@
         <el-input v-model.trim="query.title"></el-input>
       </el-form-item>
       <el-form-item label="状态:">
-        <el-select
-          v-model="query.status"
-          clearable
-          filterable
-          style="width: 120px"
-        >
+        <el-select v-model="query.status" clearable filterable style="width: 120px">
           <el-option label="已删除" :value="0"></el-option>
           <el-option label="草稿" :value="1"></el-option>
           <el-option label="已发布" :value="2"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button icon="el-icon-search" type="primary" @click="queryData"
-          >查询</el-button
-        >
+        <el-button icon="el-icon-search" type="primary" @click="queryData">查询</el-button>
         <el-button icon="el-icon-refresh" @click="reload">重置</el-button>
-        <el-button
-          icon="el-icon-circle-plus-outline"
-          type="primary"
-          @click="openView()"
-          >新增</el-button
-        >
+        <el-button icon="el-icon-circle-plus-outline" type="primary" @click="openView()">新增</el-button>
       </el-form-item>
     </el-form>
 
     <!-- stripe 带斑马纹 -->
     <el-table :data="list" stripe border style="width: 100%">
-      <el-table-column
-        align="center"
-        type="index"
-        label="序号"
-        width="60"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="title"
-        label="文章标题"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="viewCount"
-        label="浏览数"
-      ></el-table-column>
-      <el-table-column
+      <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
+      <el-table-column align="center" prop="title" label="文章标题"></el-table-column>
+      <el-table-column align="center" prop="viewCount" label="浏览数" width="60"></el-table-column>
+      <!-- <el-table-column
         align="center"
         prop="thumhup"
         label="点赞数"
-      ></el-table-column>
-      <el-table-column align="center" prop="ispublic" label="是否公开">
+      ></el-table-column> -->
+      <el-table-column align="center" prop="ispublic" label="是否公开" width="80">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.ispublic === 0" type="danger">不公开</el-tag>
           <el-tag v-if="scope.row.ispublic === 1" type="warning">公开</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="status" label="状态">
+      <el-table-column align="center" prop="status" label="状态" width="80">
         <template slot-scope="scope">
           <!--  0: 已删除, 1:未审核，2:审核通过 3: 审核未通过-->
           <el-tag v-if="scope.row.status === 0" type="danger">已删除</el-tag>
@@ -68,67 +43,37 @@
           <el-tag v-if="scope.row.status === 2" type="success">已发布</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
-        align="center"
-        prop="updateDate"
-        label="最后更新时间"
-        min-width="90px"
-      >
+      <el-table-column align="center" prop="updateDate" label="最后更新时间" width="160">
         <template slot-scope="scope">
           {{ getFormat(scope.row.updateDate) }}
         </template>
       </el-table-column>
-      <el-table-column align="left" label="操作" width="210">
+      <el-table-column align="left" label="操作" width="360">
         <template slot-scope="scope">
-          <el-button type="primary" @click="openView(scope.row.id)" size="mini"
-            >编辑</el-button
-          >
-
+          <el-button type="primary" @click="openView(scope.row.id)" size="mini"><i class="el-icon-edit"></i>编辑</el-button>
           <!-- 审核：只有status===1 才显示，其他不显示。删除：只有status !==0 才显示，其他不显示-->
-          <el-button
-            v-if="scope.row.status === 1"
-            type="success"
-            @click="handleRelease(scope.row.id)"
-            size="mini"
-            >发布</el-button
-          >
-          <el-button
-            v-if="scope.row.status === 0"
-            type="warning"
-            @click="handleRegain(scope.row.id)"
-            size="mini"
-            >恢复</el-button
-          >
-          <el-button
-            v-if="scope.row.status !== 0"
-            type="danger"
-            @click="handleDelete(scope.row.id)"
-            size="mini"
-            >删除</el-button
-          >
+          <el-button v-if="scope.row.istopping === 1" type="success" @click="handleRemoveTopping(scope.row.id)"
+            size="mini"><i class="el-icon-bottom"></i>取消置顶</el-button>
+          <el-button v-if="scope.row.istopping === 0" type="warning" @click="handleAddTopping(scope.row.id)"
+            size="mini"><i class="el-icon-upload2"></i>置顶</el-button>
+          <el-button v-if="scope.row.status === 1" type="success" @click="handleRelease(scope.row.id)" size="mini"><i
+              class="el-icon-s-promotion"></i>发布</el-button>
+          <el-button v-if="scope.row.status === 0" type="info" @click="handleRegain(scope.row.id)" size="mini"><i
+              class="el-icon-folder-checked"></i>恢复</el-button>
+          <el-button v-if="scope.row.status !== 0" type="danger" @click="handleDelete(scope.row.id)" size="mini"><i
+              class="el-icon-delete"></i>删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 分页组件 -->
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="page.current"
-      :page-sizes="[10, 20, 50]"
-      :page-size="page.size"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="page.total"
-    >
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="page.current"
+      :page-sizes="[10, 20, 50]" :page-size="page.size" layout="total, sizes, prev, pager, next, jumper"
+      :total="page.total">
     </el-pagination>
 
-    <audit
-      :title="audit.title"
-      :visible="audit.visible"
-      :remoteClose="remoteClose"
-      :id="audit.id"
-      :isAudit="audit.isAudit"
-    />
+    <audit :title="audit.title" :visible="audit.visible" :remoteClose="remoteClose" :id="audit.id"
+      :isAudit="audit.isAudit" />
   </div>
 </template>
 <script>
@@ -278,6 +223,54 @@ export default {
           // 取消删除，不用理会
         });
     },
+
+    //增加置顶
+    handleAddTopping(id) {
+      this.$confirm("确认置顶？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          // 发送删除请求
+          api.addTopping(id).then((response) => {
+            // 处理响应结果提示
+            this.$message({
+              type: response.code === 20000 ? "success" : "error",
+              message: response.data,
+            });
+            // 刷新列表数据
+            this.fetchData();
+          });
+        })
+        .catch(() => {
+          // 取消删除，不用理会
+        });
+    },
+
+      //增加置顶
+      handleRemoveTopping(id) {
+      this.$confirm("确认取消置顶？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          // 发送删除请求
+          api.removeTopping(id).then((response) => {
+            // 处理响应结果提示
+            this.$message({
+              type: response.code === 20000 ? "success" : "error",
+              message: response.data,
+            });
+            // 刷新列表数据
+            this.fetchData();
+          });
+        })
+        .catch(() => {
+          // 取消删除，不用理会
+        });
+    }
   },
 };
 </script>
